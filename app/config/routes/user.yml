@@ -1,0 +1,51 @@
+app:
+    resource: '@AppBundle/Controller/'
+    type: annotation
+
+
+user_index:
+    path:     /index
+    defaults: { _controller: AppBundle:User:index }
+
+user_add:
+    path:     /add
+    defaults: { _controller: AppBundle:User:add }
+    
+user_create:
+    path:    /create
+    defaults: { _controller: AppBundle:User:create }
+    methods: POST
+
+user_edit:
+    path:     /edit/{id}
+    defaults: { _controller: AppBundle:User:edit }    
+    
+user_update:
+    path:     /update/{id}
+    defaults: { _controller: AppBundle:User:update }    
+    methods: [POST, PUT]
+    
+user_delete:
+    path:     /delete/{id}
+    defaults: { _controller: AppBundle:User:delete }  
+    methods: [POST, DELETE]
+    
+user_view:
+    path:     /view/{id}
+    defaults: { _controller: AppBundle:User:view }    
+    
+    
+# redirecciones para la ruta /user/create     
+user_redirect_add:
+    path: /create
+    defaults:
+         _controller: AppBundle:User:add
+         path: /add
+         permant: true
+    
+user_redirect_edit:
+    path: /update/{id}
+    defaults:
+         _controller: AppBundle:User:update
+         path: /edit/{id}
+         permant: true    

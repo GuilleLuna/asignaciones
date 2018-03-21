@@ -1,0 +1,57 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Navbar</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    
+    
+    <ul class="navbar-nav mr-auto">
+       {% if is_granted('ROLE_ADMIN') %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ path('user_index') }}">Home <span class="sr-only">(current)</span></a>
+      </li>
+      
+     
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Usuaio
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ path('user_index') }}">Lista usuarios</a>
+          <a class="dropdown-item" href="{{ path('user_add') }}">Nuevo usuario</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Tareas
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ path('task_index') }}">Lista tareas</a>
+          <a class="dropdown-item" href="{{ path('task_add') }}">Nueva tarea</a>
+      </li>
+      {% endif %}
+      
+       {% if is_granted('ROLE_USER') %}
+      
+      <li>
+        <a class="nav-link" href="{{ path('task_custom') }}"> Mis Tareas</a>    
+      </li>
+      {% endif %}
+      
+    </ul>
+    
+    
+    
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a  class="btn btn-danger "href="{{ path('user_logout') }}">Logout</a>
+        </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>

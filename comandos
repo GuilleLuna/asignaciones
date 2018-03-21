@@ -1,0 +1,170 @@
+/******************************************************************************/
+/*********************************** INSTALLATION *****************************/
+//Instalar phpmyadmin
+phpmyadmin-ctl install
+
+//Comprobar requerimientos de Symfony
+php bin/symfony_requirements
+
+//Añadir tu usuario de linux al grupo www-data
+
+    capynet 1 Mar, 2013 Linux, Tip Linux, Ubuntu
+    3 comments
+
+Cuando instalo un LAMP en algún Linux suelo añadir mi usuario (capy) al grupo www-data, cambio el directorio www al grupo www-data y le doy permisos de escritura a los usuarios del grupo para garantizarme que no vaya a tener problemas de permisos y cosas raras.
+
+Lo siguiente hay que hacerlo una sola vez:
+sudo chgrp -R www-data /var/www
+sudo chmod -R g+w /var/www
+sudo find /var/www -type d -exec chmod 2775 {} \;
+sudo find /var/www -type f -exec chmod ug+rw {} \;
+
+
+sudo chgrp -R www-data /var/www
+sudo chmod -R g+w /var/www
+sudo find /var/www -type d -exec chmod 2775 {} \;
+sudo find /var/www -type f -exec chmod ug+rw {} \;
+
+Lo anterior hace esto:
+
+    Cambio todo lo que hay en /var/www para que le pertenezca al grupo www-data
+    Acomodamos los permisos de /var/www para que los usuarios que pertenezcan al grupo www-data puedan escribir.
+    A partir de ahora todos los archivos y directorios que se creen lo van a hacer con nuestro usuario y con el grupo www-data lo que nos asegura que todo el resto de los usuarios puedan seguir modificando.
+
+Ahora que tenemos listo el directorio /var/www, solo nos queda ir agregando a todos los usuarios que necesitemos al grupo www-data:
+sudo usermod -a -G www-data capy
+sudo usermod -a -G www-data otrousuario
+
+
+sudo usermod -a -G www-data capy
+sudo usermod -a -G www-data otrousuario
+
+Recuerda cerrar y abrir sesión con cada uno de estos usuarios para que se les habilite el nuevo grupo.
+
+/******************************************************************************/
+/*********************************** GENERAL **********************************/
+//Limpiar Cache
+php bin/console cache:clear --no-warmup -e prod
+
+
+/******************************************************************************/
+/*********************************** BUNDLES *********************************/
+//Crear Bundle
+php bin/console generate:bundle
+
+
+/******************************************************************************/
+/****************************** ENTIDADES (Doctrine) **************************/
+//Crear Entity
+php bin/console generate:doctrine:entity
+
+//Actualizar/crear entidades y sus relaciones de un Bundle cuando se han hecho asociaciones
+php bin/console doctrine:generate:entities AppBundle
+
+//Crear/actualizar tablas
+php bin/console doctrine:schema:update --force
+
+//Crear formulario
+php bin/console doctrine:generate:form AppBundle:Centros
+
+//Crear controlador entidades
+php bin/console generate:controller --no-interaction --controller=AppBundle:Usuarios
+
+//Crear relación onetomany (Un centro puede tener muchos teléfonos)
+    1.- Ir a la entidad one (Centros) y escribir:
+        //Entity/Centros.php
+        ...
+
+        use Doctrine\Common\Collections\ArrayCollection;
+
+        ...
+
+        /**
+         * @ORM\OneToMany(targetEntity="CentrosTelefonos", mappedBy="centros")
+         */
+        protected $centrostelefonos;
+
+        ...
+
+        public function __construct()
+        {
+            $this->centrostelefonos = new ArrayCollection();
+        }
+
+    2.- Ir a la entidad many (Teléfonos) y escribir:
+        //Entity/CentrosTelefonos.php
+
+        ...
+
+        /**
+         * @ORM\ManyToOne(targetEntity="Centros", inversedBy="centrostelefonos")
+         * @ORM\JoinColumn(name="centros_id", referencedColumnName="id", onDelete="CASCADE")
+         */
+        protected $centros;
+
+    3.- Actualizar/crear entidades y sus relaciones de un Bundle cuando se han hecho asociaciones
+        php bin/console doctrine:generate:entities AppBundle
+
+    4.- Crear/actualizar tablas
+        php bin/console doctrine:schema:update --force
+
+//Establecer que los campos CreatedAt y UpdatedAt se actualicen solos.
+
+    //EntityAlumnado
+
+    ...
+
+    /**
+     * Alumnado
+     *
+     * ...
+     *
+     * @ORM\HasLifecycleCallbacks()
+     */
+    class Alumnado
+    {
+
+    ...
+
+    /**
+     * @ORM\PrePersist
+     */
+     public function setCreatedAtValue()
+     {
+         $this->createdAt = new \DateTime();
+     }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+     public function setUpdatedAtValue()
+     {
+         $this->updatedAt = new \DateTime();
+     }
+
+
+/******************************************************************************/
+/*********************************** SEGURIDAD *******************************/
+// Codificar contraseñas con bcrypt
+Vídeo de Youtube de Edson: "08. Curso Symfony 2 - Formularios" => Minuto 37
+
+// Crear controlador para el manejo de acceso con login y password
+php bin/console generate:controller --no-interaction --controller=AppBundle:Security (Vídeo 19. Min 5)
+
+/******************************************************************************/
+/*********************************** GIT *******************************/
+mandar (push) y recibir (pull)
+
+1º Desde cloud 9 tendría que hacer lo siguiente:
+    git add .
+    git commit -m "comentario"
+    git push -u origin master  (o si es a preproduccion sería) git push -u origin preproduccion
+2º Desde el putty de proxmox dentro de la carpeta del proyecto tendría que hacer:
+    git pull
+
+Para evitar que git te pregunte constantemente usuario y contraseña:
+git config --global credential.helper store (en el siguiente acceso lo guardará y ya no lo preguntará más)
+
+Para hacer que se borre el usuario y contraseña guardado cada cierto tiempo:
+git config --global credential.helper 'cache --timeout=3600' (Lo borraría cada 15 minutos)
